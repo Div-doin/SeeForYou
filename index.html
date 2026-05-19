@@ -839,29 +839,66 @@ footer a{color:var(--cyan);text-decoration:none;}
     <div class="sec-label">Demo Media</div>
     <h2 class="sec-title">Prototype in Action</h2>
     <div class="media-grid">
-      <div class="media-placeholder" onclick="alert('Drop your demo video here!')">
-        <div class="media-icon">▶</div>
-        <span>Live Demo Video</span>
-        <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
+
+      <!-- Detection Video -->
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;">// Object Detection — YOLOv8</span>
+        </div>
+        <video
+          src="DETECTION.mp4"
+          controls
+          autoplay
+          muted
+          loop
+          playsinline
+          style="width:100%;display:block;background:#000;max-height:280px;object-fit:contain;"
+        ></video>
+        <div style="padding:14px 18px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);line-height:1.7;">
+            Real-time bounding box detection on Raspberry Pi Zero 2W. YOLOv8-tiny running fully on-device.
+          </div>
+        </div>
       </div>
-      <div class="media-placeholder" onclick="alert('Drop your detection GIF here!')">
-        <div class="media-icon">🎯</div>
-        <span>Object Detection GIF</span>
-        <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
+
+      <!-- OCR Video -->
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;">// OCR — Text Recognition</span>
+        </div>
+        <video
+          src="OCR.mp4"
+          controls
+          autoplay
+          muted
+          loop
+          playsinline
+          style="width:100%;display:block;background:#000;max-height:280px;object-fit:contain;"
+        ></video>
+        <div style="padding:14px 18px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);line-height:1.7;">
+            Motion-triggered OCR reading medicine labels, currency notes, and signage — converted to speech.
+          </div>
+        </div>
       </div>
-      <div class="media-placeholder" onclick="alert('Drop your hardware photo here!')">
+
+      <!-- Hardware Photo placeholder -->
+      <div class="media-placeholder" onclick="alert('Add your hardware build photo here!')">
         <div class="media-icon">📸</div>
         <span>Hardware Build Photo</span>
         <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
       </div>
-      <div class="media-placeholder" onclick="alert('Drop your depth map output here!')">
+
+      <!-- Depth Map placeholder -->
+      <div class="media-placeholder" onclick="alert('Add your depth map output here!')">
         <div class="media-icon">🌊</div>
         <span>Depth Map Output</span>
         <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
       </div>
+
     </div>
     <p style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:20px;letter-spacing:1px;">
-      // Replace placeholders with actual demo footage once available
+      // Hardware photos and depth map output coming soon
     </p>
   </div>
 </section>
