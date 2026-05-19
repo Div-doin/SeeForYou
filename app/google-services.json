@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "268711830966",
+    "project_id": "seeforyou-5420a",
+    "storage_bucket": "seeforyou-5420a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:268711830966:android:0176a485448430f76c0d17",
+        "android_client_info": {
+          "package_name": "com.example.seeforyou"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDChSWiSwojbR5vyGtreNO8GIg3_5dlfug"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
