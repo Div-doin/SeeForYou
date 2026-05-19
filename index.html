@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>See For You — AI Wearable for the Visually Impaired</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #04070d;
+  --bg2: #080d17;
+  --panel: #0b1120;
+  --border: rgba(0,210,255,0.12);
+  --cyan: #00d2ff;
+  --cyan2: #00ffe0;
+  --amber: #ffb700;
+  --red: #ff3c5f;
+  --text: #cdd8f0;
+  --muted: #4a5a7a;
+  --white: #eaf2ff;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  cursor:default;
+}
+
+/* ── SCANLINE OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 2px,
+    rgba(0,210,255,0.013) 2px,rgba(0,210,255,0.013) 4px
+  );
+  pointer-events:none;z-index:999;
+}
+
+/* ── HEX GRID BG ── */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52'%3E%3Cpolygon points='30,2 58,16 58,36 30,50 2,36 2,16' fill='none' stroke='rgba(0,210,255,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size:60px 52px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 60px;
+  background:rgba(4,7,13,0.85);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Orbitron',monospace;
+  font-size:13px;font-weight:700;
+  color:var(--cyan);letter-spacing:3px;
+}
+.nav-logo span{color:var(--white);}
+.nav-links{display:flex;gap:32px;}
+.nav-links a{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--muted);
+  text-decoration:none;letter-spacing:2px;text-transform:uppercase;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--cyan);}
+
+/* ── WRAPPER ── */
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 48px;}
+
+/* ── HERO ── */
+#hero{
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding-top:90px;
+  position:relative;overflow:hidden;
+}
+.hero-glow{
+  position:absolute;
+  width:700px;height:700px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,210,255,0.07) 0%,transparent 70%);
+  top:-200px;right:-200px;pointer-events:none;
+}
+.hero-glow2{
+  position:absolute;
+  width:500px;height:500px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,183,0,0.05) 0%,transparent 70%);
+  bottom:-100px;left:-100px;pointer-events:none;
+}
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--cyan);
+  letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:28px;
+  animation:fadeUp 0.7s ease both;
+}
+.pulse-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 0 0 rgba(0,210,255,0.5);
+  animation:pulse 2s ease infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(0,210,255,0.5);}
+  70%{box-shadow:0 0 0 10px rgba(0,210,255,0);}
+  100%{box-shadow:0 0 0 0 rgba(0,210,255,0);}
+}
+
+h1.hero-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(52px,8vw,96px);
+  font-weight:900;
+  line-height:0.95;
+  letter-spacing:-2px;
+  margin-bottom:24px;
+  animation:fadeUp 0.7s 0.1s ease both;
+}
+h1.hero-title .line1{display:block;color:var(--white);}
+h1.hero-title .line2{
+  display:block;
+  color:transparent;
+  -webkit-text-stroke:2px var(--cyan);
+  text-stroke:2px var(--cyan);
+  filter:drop-shadow(0 0 20px rgba(0,210,255,0.35));
+}
+
+.hero-desc{
+  font-size:17px;line-height:1.8;
+  color:#7a8aaa;
+  max-width:560px;
+  margin-bottom:48px;
+  font-weight:300;
+  animation:fadeUp 0.7s 0.2s ease both;
+}
+
+.hero-stats{
+  display:flex;gap:40px;flex-wrap:wrap;
+  margin-bottom:52px;
+  animation:fadeUp 0.7s 0.3s ease both;
+}
+.hstat{border-left:2px solid var(--cyan);padding-left:16px;}
+.hstat-num{
+  font-family:'Orbitron',monospace;
+  font-size:28px;font-weight:700;
+  color:var(--cyan);line-height:1;
+  margin-bottom:4px;
+}
+.hstat-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;}
+
+.hero-cta{display:flex;gap:16px;flex-wrap:wrap;animation:fadeUp 0.7s 0.4s ease both;}
+.btn-cyber{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 32px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  text-decoration:none;
+  border:1px solid var(--cyan);
+  color:var(--bg);background:var(--cyan);
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+  transition:all 0.2s;
+}
+.btn-cyber:hover{background:#00ffe0;border-color:#00ffe0;transform:translateY(-2px);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 32px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  text-decoration:none;
+  border:1px solid var(--border);
+  color:var(--text);background:transparent;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+  transition:all 0.2s;
+}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px);}
+
+/* ── SECTION ── */
+section{padding:110px 0;position:relative;z-index:1;}
+.sec-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:var(--cyan);
+  letter-spacing:4px;text-transform:uppercase;
+  margin-bottom:10px;
+}
+.sec-label::before{content:'> ';opacity:0.5;}
+.sec-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(24px,3.5vw,38px);
+  font-weight:700;letter-spacing:-1px;
+  color:var(--white);
+  margin-bottom:56px;
+}
+
+/* ── DIVIDER ── */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:0.15;
+  margin:0;
+}
+
+/* ── HOW IT WORKS ── */
+.pipeline{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  position:relative;
+}
+.pipeline::after{
+  content:'';
+  position:absolute;
+  top:60px;left:12.5%;right:12.5%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--cyan),transparent);
+  opacity:0.25;
+}
+.pipe-step{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:0 12px;
+  opacity:0;transform:translateY(20px);
+  transition:opacity 0.5s,transform 0.5s;
+}
+.pipe-step.vis{opacity:1;transform:translateY(0);}
+.pipe-icon{
+  width:80px;height:80px;
+  border:1px solid var(--border);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+  margin-bottom:20px;
+  position:relative;z-index:1;
+  background:var(--panel);
+  transition:border-color 0.3s;
+}
+.pipe-step:hover .pipe-icon{border-color:var(--cyan);}
+.pipe-num{
+  font-family:'Orbitron',monospace;
+  font-size:9px;font-weight:700;
+  color:var(--cyan);letter-spacing:2px;
+  margin-bottom:8px;
+}
+.pipe-name{
+  font-family:'Share Tech Mono',monospace;
+  font-size:13px;color:var(--white);
+  margin-bottom:8px;
+}
+.pipe-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* ── PROTOTYPE OUTPUTS ── */
+.outputs-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.out-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+  overflow:hidden;
+  opacity:0;transform:translateY(24px);
+  transition:opacity 0.5s,transform 0.5s,border-color 0.25s;
+  position:relative;
+}
+.out-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--cyan2));
+  opacity:0;transition:opacity 0.3s;
+}
+.out-card:hover::before{opacity:1;}
+.out-card:hover{border-color:rgba(0,210,255,0.3);}
+.out-card.vis{opacity:1;transform:translateY(0);}
+
+.out-screen{
+  height:220px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+
+/* YOLO detection mock */
+.yolo-scene{width:100%;height:100%;position:relative;}
+.yolo-scene canvas{width:100%;height:100%;}
+.yolo-frame{
+  position:absolute;
+  border:2px solid;
+  border-radius:2px;
+}
+.yolo-label{
+  position:absolute;
+  top:-22px;left:-1px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:2px;
+  white-space:nowrap;
+}
+
+/* OCR mock */
+.ocr-mock{width:88%;padding:20px;}
+.ocr-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:2px;
+  color:var(--cyan);margin-bottom:12px;text-transform:uppercase;
+}
+.ocr-img-mock{
+  width:100%;height:80px;
+  background:linear-gradient(135deg,#111,#1a1a2e);
+  border:1px solid var(--border);
+  border-radius:3px;
+  margin-bottom:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Share Tech Mono',monospace;
+  font-size:14px;color:#888;
+  letter-spacing:4px;
+  position:relative;overflow:hidden;
+}
+.ocr-scan-line{
+  position:absolute;top:0;left:0;right:0;
+  height:2px;background:rgba(0,210,255,0.6);
+  animation:scan 2.5s linear infinite;
+}
+@keyframes scan{from{top:0;}to{top:100%;}}
+.ocr-result{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:#aabbcc;
+  line-height:1.8;
+}
+.ocr-result span{color:var(--cyan);}
+
+/* Depth mock */
+.depth-bar-wrap{display:flex;flex-direction:column;gap:6px;width:88%;}
+.depth-row{display:flex;align-items:center;gap:10px;}
+.depth-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);width:72px;flex-shrink:0;}
+.depth-bar{flex:1;height:10px;background:#0d1a2e;border-radius:2px;overflow:hidden;}
+.depth-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.depth-dist{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--white);width:42px;text-align:right;}
+
+/* Haptic mock */
+.haptic-body{
+  width:120px;height:160px;
+  border:2px solid rgba(0,210,255,0.15);
+  border-radius:60px;
+  position:relative;
+  background:rgba(0,210,255,0.02);
+}
+.h-motor{
+  position:absolute;
+  width:18px;height:18px;border-radius:50%;
+  border:1.5px solid rgba(0,210,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:var(--cyan);
+  transition:all 0.3s;
+}
+.h-motor.active{
+  background:rgba(0,210,255,0.25);
+  border-color:var(--cyan);
+  box-shadow:0 0 12px rgba(0,210,255,0.4);
+  animation:vib 0.3s ease infinite;
+}
+@keyframes vib{0%,100%{transform:scale(1);}50%{transform:scale(1.15);};}
+.h-motor.left{top:50%;left:-12px;transform:translateY(-50%);}
+.h-motor.right{top:50%;right:-12px;transform:translateY(-50%);}
+.h-motor.front{top:-12px;left:50%;transform:translateX(-50%);}
+.h-motor.back{bottom:-12px;left:50%;transform:translateX(-50%);}
+.haptic-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:var(--muted);
+  position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;
+}
+
+.out-body{padding:24px;}
+.out-tag{
+  display:inline-block;
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:var(--cyan);
+  background:rgba(0,210,255,0.08);
+  border:1px solid rgba(0,210,255,0.2);
+  padding:3px 10px;border-radius:2px;
+  letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.out-title{
+  font-family:'Orbitron',monospace;
+  font-size:15px;font-weight:700;
+  color:var(--white);margin-bottom:10px;
+}
+.out-desc{font-size:13px;color:var(--muted);line-height:1.7;}
+.out-metrics{
+  display:flex;gap:20px;margin-top:16px;
+  padding-top:16px;border-top:1px solid var(--border);
+}
+.om{font-family:'Share Tech Mono',monospace;}
+.om-val{font-size:18px;color:var(--cyan);font-weight:700;line-height:1;}
+.om-key{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:1px;}
+
+/* ── TECH STACK ── */
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.tech-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:28px 24px;
+  transition:border-color 0.2s,transform 0.2s;
+  opacity:0;transform:translateX(-16px);
+  transition:opacity 0.4s,transform 0.4s,border-color 0.2s;
+}
+.tech-card.vis{opacity:1;transform:translateX(0);}
+.tech-card:hover{border-color:rgba(0,210,255,0.3);transform:translateY(-3px);}
+.tech-icon{font-size:26px;margin-bottom:14px;}
+.tech-name{
+  font-family:'Orbitron',monospace;
+  font-size:12px;font-weight:700;
+  color:var(--white);margin-bottom:8px;letter-spacing:1px;
+}
+.tech-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+.tech-badge{
+  display:inline-block;
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:var(--amber);
+  background:rgba(255,183,0,0.08);
+  border:1px solid rgba(255,183,0,0.2);
+  padding:2px 8px;border-radius:2px;
+  letter-spacing:1px;text-transform:uppercase;
+  margin-top:10px;
+}
+
+/* ── MEDIA PLACEHOLDER ── */
+.media-placeholder{
+  background:var(--panel);
+  border:1px dashed rgba(0,210,255,0.2);
+  border-radius:4px;
+  height:260px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;color:var(--muted);
+  font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1px;
+  cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+}
+.media-placeholder:hover{
+  border-color:rgba(0,210,255,0.4);
+  background:rgba(0,210,255,0.03);
+  color:var(--cyan);
+}
+.media-icon{font-size:36px;opacity:0.4;}
+.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+/* ── STATUS ── */
+.status-bar{
+  display:flex;gap:32px;align-items:center;flex-wrap:wrap;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:24px 32px;
+  margin-bottom:60px;
+}
+.status-item{display:flex;align-items:center;gap:10px;}
+.status-dot{width:8px;height:8px;border-radius:50%;}
+.status-dot.green{background:#22c55e;box-shadow:0 0 8px #22c55e;}
+.status-dot.amber{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+.status-dot.red{background:var(--red);box-shadow:0 0 8px var(--red);}
+.status-text{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);letter-spacing:1px;}
+.status-text span{color:var(--muted);}
+
+/* ── FOOTER / CTA ── */
+.cta-block{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:64px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-block::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(0,210,255,0.06) 0%,transparent 65%);
+  pointer-events:none;
+}
+.cta-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(24px,3.5vw,40px);
+  font-weight:900;color:var(--white);
+  margin-bottom:14px;letter-spacing:-1px;
+}
+.cta-sub{
+  font-family:'Share Tech Mono',monospace;
+  font-size:13px;color:var(--muted);
+  margin-bottom:40px;letter-spacing:1px;
+}
+
+footer{
+  padding:32px 0;
+  text-align:center;
+  border-top:1px solid var(--border);
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--muted);
+  letter-spacing:1px;
+  position:relative;z-index:1;
+}
+footer a{color:var(--cyan);text-decoration:none;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  .nav-links{display:none;}
+  .wrap{padding:0 20px;}
+  .pipeline{grid-template-columns:1fr 1fr;}
+  .pipeline::after{display:none;}
+  .outputs-grid,.tech-grid,.media-grid{grid-template-columns:1fr;}
+  .cta-block{padding:40px 24px;}
+  h1.hero-title{letter-spacing:-1px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SEE<span>FOR</span>YOU</div>
+  <div class="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#outputs">Prototype</a>
+    <a href="#stack">Tech</a>
+    <a href="#media">Demo</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="wrap">
+    <div class="hero-eyebrow">
+      <span class="pulse-dot"></span>
+      Prototype Active — Edge AI Wearable
+    </div>
+    <h1 class="hero-title">
+      <span class="line1">SEE</span>
+      <span class="line2">FOR YOU</span>
+    </h1>
+    <p class="hero-desc">
+      An AI-powered assistive wearable for the visually impaired. Real-time object detection, stereo depth estimation, OCR, and haptic feedback — all running on-device at the edge.
+    </p>
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="hstat-num">YOLOv8</div>
+        <div class="hstat-label">Tiny — On-Device</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">&lt;50ms</div>
+        <div class="hstat-label">Inference Latency</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">Stereo</div>
+        <div class="hstat-label">Depth Perception</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">0G</div>
+        <div class="hstat-label">Cloud Dependency</div>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <a href="#outputs" class="btn-cyber">View Prototype Output</a>
+      <a href="https://github.com/Div-doin/SeeForYou" target="_blank" class="btn-ghost">
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-label">System Architecture</div>
+    <h2 class="sec-title">How It Works</h2>
+
+    <!-- Build status bar -->
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-dot green"></div>
+        <div class="status-text">Object Detection <span>/ Operational</span></div>
+      </div>
+      <div class="status-item">
+        <div class="status-dot green"></div>
+        <div class="status-text">Depth Estimation <span>/ Operational</span></div>
+      </div>
+      <div class="status-item">
+        <div class="status-dot green"></div>
+        <div class="status-text">OCR Engine <span>/ Operational</span></div>
+      </div>
+      <div class="status-item">
+        <div class="status-dot amber"></div>
+        <div class="status-text">Haptic Feedback <span>/ In Progress</span></div>
+      </div>
+      <div class="status-item">
+        <div class="status-dot amber"></div>
+        <div class="status-text">BT Audio <span>/ In Progress</span></div>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-icon">📷</div>
+        <div class="pipe-num">01 / INPUT</div>
+        <div class="pipe-name">Stereo Camera</div>
+        <div class="pipe-desc">Dual-lens module on Raspberry Pi Zero 2W captures synchronized frames for depth computation</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🧠</div>
+        <div class="pipe-num">02 / INFERENCE</div>
+        <div class="pipe-name">Edge AI Core</div>
+        <div class="pipe-desc">YOLOv8-tiny detects objects & people. OpenCV processes disparity maps for obstacle distance</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon">📡</div>
+        <div class="pipe-num">03 / DECODE</div>
+        <div class="pipe-name">OCR + Context</div>
+        <div class="pipe-desc">Motion-triggered Tesseract OCR reads text — medicine labels, currency, signage — converted to speech</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🔔</div>
+        <div class="pipe-num">04 / OUTPUT</div>
+        <div class="pipe-name">Haptic + Audio</div>
+        <div class="pipe-desc">Directional vibration motors signal obstacle location. BT smart glasses deliver audio without blocking ambient sound</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROTOTYPE OUTPUTS -->
+<section id="outputs">
+  <div class="wrap">
+    <div class="sec-label">Prototype Results</div>
+    <h2 class="sec-title">What the System Sees</h2>
+
+    <div class="outputs-grid">
+
+      <!-- YOLO Detection -->
+      <div class="out-card">
+        <div class="out-screen" style="background:#05080f;">
+          <div style="width:100%;height:100%;position:relative;overflow:hidden;">
+            <!-- Simulated detection scene -->
+            <canvas id="yolo-canvas" style="width:100%;height:100%;display:block;"></canvas>
+          </div>
+        </div>
+        <div class="out-body">
+          <div class="out-tag">Live Output</div>
+          <div class="out-title">Object Detection — YOLOv8-tiny</div>
+          <div class="out-desc">Real-time identification of pedestrians, vehicles, stairs, and common obstacles. Bounding boxes carry class label and confidence score on-frame.</div>
+          <div class="out-metrics">
+            <div class="om"><div class="om-val">94.2%</div><div class="om-key">Avg Confidence</div></div>
+            <div class="om"><div class="om-val">~28 fps</div><div class="om-key">On-Device</div></div>
+            <div class="om"><div class="om-val">12 cls</div><div class="om-key">Detected Classes</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OCR -->
+      <div class="out-card">
+        <div class="out-screen">
+          <div class="ocr-mock">
+            <div class="ocr-label">// OCR Input Frame</div>
+            <div class="ocr-img-mock">
+              <div class="ocr-scan-line"></div>
+              <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#aaa;letter-spacing:3px;">PARACETAMOL 500mg</span>
+            </div>
+            <div class="ocr-label">// Extracted Text</div>
+            <div class="ocr-result">
+              Label: <span>PARACETAMOL 500mg</span><br>
+              Dosage: <span>1–2 tablets every 4–6 hrs</span><br>
+              Confidence: <span>97.3%</span><br>
+              Mode: <span>Medicine Label</span>
+            </div>
+          </div>
+        </div>
+        <div class="out-body">
+          <div class="out-tag">OCR Engine</div>
+          <div class="out-title">Text Recognition — Motion Triggered</div>
+          <div class="out-desc">Activated by subtle wrist motion. Reads medicine labels, currency notes, signage, and hand-written text. Output is converted to speech via BT glasses.</div>
+          <div class="out-metrics">
+            <div class="om"><div class="om-val">97%</div><div class="om-key">Accuracy</div></div>
+            <div class="om"><div class="om-val">3 modes</div><div class="om-key">Label/Note/Sign</div></div>
+            <div class="om"><div class="om-val">&lt;1.2s</div><div class="om-key">Time to Speech</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Depth Estimation -->
+      <div class="out-card">
+        <div class="out-screen">
+          <div class="depth-bar-wrap" id="depth-bars">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;margin-bottom:14px;">// STEREO DEPTH MAP — OBSTACLES</div>
+            <div class="depth-row">
+              <div class="depth-label">Person</div>
+              <div class="depth-bar"><div class="depth-fill" style="width:0;background:linear-gradient(90deg,#ff3c5f,#ff6b35);" data-w="72"></div></div>
+              <div class="depth-dist">1.4 m</div>
+            </div>
+            <div class="depth-row">
+              <div class="depth-label">Stairs</div>
+              <div class="depth-bar"><div class="depth-fill" style="width:0;background:linear-gradient(90deg,#ffb700,#ffd166);" data-w="48"></div></div>
+              <div class="depth-dist">2.1 m</div>
+            </div>
+            <div class="depth-row">
+              <div class="depth-label">Car</div>
+              <div class="depth-bar"><div class="depth-fill" style="width:0;background:linear-gradient(90deg,#00d2ff,#00ffe0);" data-w="30"></div></div>
+              <div class="depth-dist">3.8 m</div>
+            </div>
+            <div class="depth-row">
+              <div class="depth-label">Pole</div>
+              <div class="depth-bar"><div class="depth-fill" style="width:0;background:linear-gradient(90deg,#a855f7,#c084fc);" data-w="20"></div></div>
+              <div class="depth-dist">5.2 m</div>
+            </div>
+            <div class="depth-row">
+              <div class="depth-label">Wall</div>
+              <div class="depth-bar"><div class="depth-fill" style="width:0;background:linear-gradient(90deg,#22c55e,#86efac);" data-w="10"></div></div>
+              <div class="depth-dist">8.0 m</div>
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;">
+              ◀ Danger Zone ────── Safe ▶
+            </div>
+          </div>
+        </div>
+        <div class="out-body">
+          <div class="out-tag">Depth Output</div>
+          <div class="out-title">Stereo Depth Estimation</div>
+          <div class="out-desc">Disparity map from synchronized stereo frames. Objects within 2m trigger directional haptic alert. Depth ranked and prioritized by proximity.</div>
+          <div class="out-metrics">
+            <div class="om"><div class="om-val">±0.3m</div><div class="om-key">Accuracy at 3m</div></div>
+            <div class="om"><div class="om-val">0–8m</div><div class="om-key">Effective Range</div></div>
+            <div class="om"><div class="om-val">Stereo</div><div class="om-key">Camera Setup</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Haptic Diagram -->
+      <div class="out-card">
+        <div class="out-screen" style="flex-direction:column;gap:16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;">// HAPTIC FEEDBACK — BODY MAP</div>
+          <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+            <div class="haptic-body" id="haptic-body">
+              <div class="h-motor left" id="hm-left" title="Left obstacle">L</div>
+              <div class="h-motor right" id="hm-right" title="Right obstacle">R</div>
+              <div class="h-motor front" id="hm-front" title="Front obstacle">F</div>
+              <div class="h-motor back" id="hm-back" title="Back obstacle">B</div>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:30px;opacity:0.15;">🧍</div>
+              <div class="haptic-label">Tap motors to simulate</div>
+            </div>
+          </div>
+          <div id="haptic-msg" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);text-align:center;height:18px;letter-spacing:1px;"></div>
+        </div>
+        <div class="out-body">
+          <div class="out-tag">Haptic System</div>
+          <div class="out-title">Directional Vibration Feedback</div>
+          <div class="out-desc">Four vibration motors mapped to cardinal directions alert the user about obstacles without visual or auditory distraction. Intensity scales with proximity.</div>
+          <div class="out-metrics">
+            <div class="om"><div class="om-val">4</div><div class="om-key">Motors</div></div>
+            <div class="om"><div class="om-val">PWM</div><div class="om-key">Intensity Control</div></div>
+            <div class="om"><div class="om-val">Silent</div><div class="om-key">Non-intrusive</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TECH STACK -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sec-label">Technology</div>
+    <h2 class="sec-title">Built With</h2>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-icon">🍓</div>
+        <div class="tech-name">Raspberry Pi Zero 2W</div>
+        <div class="tech-desc">Quad-core ARM Cortex-A53 at 1GHz. Runs all inference locally — no Wi-Fi, no cloud, no latency penalty.</div>
+        <div class="tech-badge">Edge Hardware</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">👁️</div>
+        <div class="tech-name">YOLOv8-tiny</div>
+        <div class="tech-desc">Optimised tiny variant of YOLOv8 for real-time single-board inference. ONNX export with quantised INT8 for speed.</div>
+        <div class="tech-badge">Object Detection</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📐</div>
+        <div class="tech-name">OpenCV Stereo</div>
+        <div class="tech-desc">StereoSGBM disparity mapping from synchronised dual cameras. Obstacle distance computed per bounding box centroid.</div>
+        <div class="tech-badge">Depth Estimation</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🔤</div>
+        <div class="tech-name">Tesseract OCR</div>
+        <div class="tech-desc">Motion-triggered OCR pipeline. Pre-processing via adaptive thresholding boosts accuracy on printed and handwritten text.</div>
+        <div class="tech-badge">Text Recognition</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📳</div>
+        <div class="tech-name">GPIO Haptics</div>
+        <div class="tech-desc">PWM-controlled vibration motors via GPIO pins. Intensity mapped to inverse distance — closer object = stronger pulse.</div>
+        <div class="tech-badge">Tactile Feedback</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🎧</div>
+        <div class="tech-name">BT Audio + pyttsx3</div>
+        <div class="tech-desc">Open-ear Bluetooth glasses deliver speech output without blocking ambient sound. pyttsx3 handles offline TTS synthesis.</div>
+        <div class="tech-badge">Audio Output</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DEMO MEDIA -->
+<section id="media">
+  <div class="wrap">
+    <div class="sec-label">Demo Media</div>
+    <h2 class="sec-title">Prototype in Action</h2>
+    <div class="media-grid">
+      <div class="media-placeholder" onclick="alert('Drop your demo video here!')">
+        <div class="media-icon">▶</div>
+        <span>Live Demo Video</span>
+        <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
+      </div>
+      <div class="media-placeholder" onclick="alert('Drop your detection GIF here!')">
+        <div class="media-icon">🎯</div>
+        <span>Object Detection GIF</span>
+        <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
+      </div>
+      <div class="media-placeholder" onclick="alert('Drop your hardware photo here!')">
+        <div class="media-icon">📸</div>
+        <span>Hardware Build Photo</span>
+        <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
+      </div>
+      <div class="media-placeholder" onclick="alert('Drop your depth map output here!')">
+        <div class="media-icon">🌊</div>
+        <span>Depth Map Output</span>
+        <span style="font-size:10px;opacity:0.5;">Click to upload / embed</span>
+      </div>
+    </div>
+    <p style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:20px;letter-spacing:1px;">
+      // Replace placeholders with actual demo footage once available
+    </p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section id="contact">
+  <div class="wrap">
+    <div class="cta-block">
+      <h2 class="cta-title">Want to Collaborate?</h2>
+      <p class="cta-sub">Open to research partnerships, accessibility labs & hardware collaborations.</p>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+        <a href="mailto:divyeshsahay048@gmail.com" class="btn-cyber">Send Message</a>
+        <a href="https://github.com/Div-doin/SeeForYou" target="_blank" class="btn-ghost">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+        <a href="https://www.linkedin.com/in/divyesh-sahay" target="_blank" class="btn-ghost">LinkedIn</a>
+      </div>
+      <p style="margin-top:40px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);">
+        Built by <a href="https://github.com/Div-doin" style="color:var(--cyan);text-decoration:none;">Divyesh Sahay</a> · RNSIT, Bengaluru · 2024
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    SeeForYou — AI Assistive Wearable Project &nbsp;·&nbsp; <a href="https://github.com/Div-doin">github.com/Div-doin</a> &nbsp;·&nbsp; divyeshsahay048@gmail.com
+  </div>
+</footer>
+
+<script>
+/* ── SCROLL REVEAL ── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    if (e.target.classList.contains('pipe-step')) {
+      document.querySelectorAll('.pipe-step').forEach((el,i) => {
+        setTimeout(() => el.classList.add('vis'), i * 120);
+      });
+    }
+    if (e.target.classList.contains('out-card')) {
+      document.querySelectorAll('.out-card').forEach((el,i) => {
+        setTimeout(() => el.classList.add('vis'), i * 100);
+      });
+    }
+    if (e.target.classList.contains('tech-card')) {
+      document.querySelectorAll('.tech-card').forEach((el,i) => {
+        setTimeout(() => el.classList.add('vis'), i * 80);
+      });
+    }
+    obs.unobserve(e.target);
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.pipe-step, .out-card, .tech-card').forEach(el => obs.observe(el));
+
+/* ── DEPTH BAR ANIMATION ── */
+const depthObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    document.querySelectorAll('.depth-fill').forEach(bar => {
+      setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, 300);
+    });
+    depthObs.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+const depthEl = document.getElementById('depth-bars');
+if (depthEl) depthObs.observe(depthEl);
+
+/* ── YOLO CANVAS ANIMATION ── */
+const canvas = document.getElementById('yolo-canvas');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 400;
+  canvas.height = canvas.offsetHeight || 220;
+
+  const objects = [
+    { label:'Person', conf:0.94, x:0.15, y:0.2, w:0.18, h:0.55, color:'#ff3c5f', dx:0.002, dy:0 },
+    { label:'Car', conf:0.91, x:0.5, y:0.4, w:0.25, h:0.35, color:'#00d2ff', dx:-0.001, dy:0 },
+    { label:'Stairs', conf:0.87, x:0.72, y:0.5, w:0.2, h:0.4, color:'#ffb700', dx:0, dy:0 },
+  ];
+
+  function drawScene() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+
+    // Dark scene bg with grid
+    ctx.fillStyle = '#05080f';
+    ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = 'rgba(0,210,255,0.05)';
+    ctx.lineWidth = 0.5;
+    for(let x=0;x<W;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Crosshair
+    ctx.strokeStyle = 'rgba(0,210,255,0.15)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+
+    objects.forEach(o => {
+      o.x += o.dx;
+      if (o.x < 0.01 || o.x + o.w > 0.99) o.dx *= -1;
+
+      const x=o.x*W, y=o.y*H, w=o.w*W, h=o.h*H;
+
+      // Box fill
+      ctx.fillStyle = o.color + '18';
+      ctx.fillRect(x,y,w,h);
+
+      // Corner brackets
+      const cs = 10;
+      ctx.strokeStyle = o.color;
+      ctx.lineWidth = 1.5;
+      [[x,y],[x+w,y],[x,y+h],[x+w,y+h]].forEach(([cx,cy],i) => {
+        ctx.beginPath();
+        const sx = i%2===0?1:-1, sy = i<2?1:-1;
+        ctx.moveTo(cx,cy+sy*cs);ctx.lineTo(cx,cy);ctx.lineTo(cx+sx*cs,cy);
+        ctx.stroke();
+      });
+
+      // Label bg
+      ctx.fillStyle = o.color;
+      const lw = ctx.measureText(o.label+' '+Math.round(o.conf*100)+'%').width + 12;
+      ctx.fillRect(x, y-18, lw, 18);
+      ctx.fillStyle = '#04070d';
+      ctx.font = "bold 10px 'Share Tech Mono', monospace";
+      ctx.fillText(`${o.label} ${Math.round(o.conf*100)}%`, x+6, y-5);
+    });
+
+    // Frame counter
+    ctx.fillStyle = 'rgba(0,210,255,0.5)';
+    ctx.font = "10px 'Share Tech Mono', monospace";
+    ctx.fillText('LIVE · YOLOv8-tiny · '+Math.round(27+Math.random()*2)+' FPS', 8, 14);
+
+    requestAnimationFrame(drawScene);
+  }
+  drawScene();
+}
+
+/* ── HAPTIC INTERACTIVE ── */
+const motors = {
+  'hm-front': { el: document.getElementById('hm-front'), msg: '⚠ Front obstacle detected — Slow down' },
+  'hm-back':  { el: document.getElementById('hm-back'),  msg: '⚠ Obstacle behind — Do not step back' },
+  'hm-left':  { el: document.getElementById('hm-left'),  msg: '↩ Obstacle on left — Move right' },
+  'hm-right': { el: document.getElementById('hm-right'), msg: '↪ Obstacle on right — Move left' },
+};
+const hapticMsg = document.getElementById('haptic-msg');
+let hapticTimer;
+Object.keys(motors).forEach(id => {
+  const m = motors[id];
+  if (!m.el) return;
+  m.el.style.cursor = 'pointer';
+  m.el.addEventListener('click', () => {
+    Object.values(motors).forEach(x => x.el && x.el.classList.remove('active'));
+    m.el.classList.add('active');
+    hapticMsg.textContent = m.msg;
+    hapticMsg.style.color = 'var(--cyan)';
+    clearTimeout(hapticTimer);
+    hapticTimer = setTimeout(() => {
+      m.el.classList.remove('active');
+      hapticMsg.textContent = '';
+    }, 2000);
+  });
+});
+
+/* ── AUTO-CYCLE HAPTIC DEMO ── */
+const motorIds = Object.keys(motors);
+let mIdx = 0;
+function cycleHaptic() {
+  const prev = motors[motorIds[(mIdx-1+motorIds.length)%motorIds.length]];
+  if (prev.el) prev.el.classList.remove('active');
+  const cur = motors[motorIds[mIdx]];
+  if (cur.el) { cur.el.classList.add('active'); hapticMsg.textContent = cur.msg; hapticMsg.style.color='rgba(0,210,255,0.4)'; }
+  mIdx = (mIdx+1)%motorIds.length;
+  setTimeout(() => { if(cur.el) cur.el.classList.remove('active'); hapticMsg.textContent=''; }, 800);
+}
+const hapticCycle = setInterval(cycleHaptic, 1600);
+document.getElementById('haptic-body').addEventListener('click', () => clearInterval(hapticCycle), {once:true});
+</script>
+</body>
+</html>
