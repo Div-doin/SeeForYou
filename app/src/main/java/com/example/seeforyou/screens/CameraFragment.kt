@@ -17,10 +17,9 @@ import androidx.fragment.app.Fragment
 import com.example.seeforyou.R
 import com.example.seeforyou.services.FirebaseService
 import com.example.seeforyou.services.TtsService
+import com.example.seeforyou.utils.Detection
 import com.example.seeforyou.utils.DetectionOverlayView
 import com.example.seeforyou.utils.YoloDetector
-import com.google.firebase.storage.FirebaseStorage
-import java.io.ByteArrayOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -36,15 +35,10 @@ class CameraFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var yoloDetector: YoloDetector
 
-    private var frameCount = 0
-
-    // --- Firebase streaming ---
-    // Upload every Nth processed frame to Firebase Storage
-    // so a laptop viewer sees a near-live JPEG at:
-    //   gs://<your-bucket>/stream/frame.jpg
-    private val streamFrameInterval = 10   // upload 1 out of every 10 processed frames
-    private var streamFrameCount    = 0
-    private var isUploading         = false // simple guard — skip if previous upload still running
+    // Keep last result for skipped frames
+    private var lastDetections: List<Detection> = emptyList()
+    private var lastBitmapWidth = 1
+    private var lastBitmapHeight = 1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -138,52 +132,56 @@ class CameraFragment : Fragment() {
     }
 
     private fun processFrame(imageProxy: ImageProxy) {
-        frameCount++
-        if (frameCount % 3 != 0) {
-            imageProxy.close()
-            return
-        }
-
         val bitmap = imageProxy.toBitmap()
         val rotationDegrees = imageProxy.imageInfo.rotationDegrees
         imageProxy.close()
 
         val rotatedBitmap = rotateBitmap(bitmap, rotationDegrees)
 
-        // --- Stream frame to Firebase Storage ---
-        streamFrameCount++
-        if (streamFrameCount % streamFrameInterval == 0 && !isUploading) {
-            uploadFrameToFirebase(rotatedBitmap)
+        // detectWithMotion returns:
+        // null            → frame skipped, reuse lastDetections
+        // emptyList()     → ran inference, nothing found
+        // list of results → ran inference, objects found
+        val result = yoloDetector.detectWithMotion(rotatedBitmap)
+
+        if (result != null) {
+            // Inference ran — update last known result
+            lastDetections = result
+            lastBitmapWidth = rotatedBitmap.width
+            lastBitmapHeight = rotatedBitmap.height
+
+            if (result.isNotEmpty()) {
+                val top   = result[0]
+                tts.speak("${top.label} ahead")
+                if (top.confidence > 0.7f) {
+                    FirebaseService.logDetection(top.label, top.confidence)
+                }
+            }
         }
+        // If result is null (skipped frame), we just redraw with lastDetections
 
-        val detections = yoloDetector.detect(rotatedBitmap)
+        updateUI(lastDetections, lastBitmapWidth, lastBitmapHeight)
+    }
 
-        if (detections.isEmpty()) {
-            activity?.runOnUiThread {
+    private fun updateUI(
+        detections: List<Detection>,
+        bitmapWidth: Int,
+        bitmapHeight: Int
+    ) {
+        activity?.runOnUiThread {
+            overlay.setYoloResults(detections, bitmapWidth, bitmapHeight)
+
+            if (detections.isEmpty()) {
                 tvLabel.text = "Scanning..."
                 tvConf.text  = ""
                 tvObject1.visibility = View.GONE
                 tvObject2.visibility = View.GONE
-                overlay.setYoloResults(emptyList(), rotatedBitmap.width, rotatedBitmap.height)
+                return@runOnUiThread
             }
-            return
-        }
 
-        val top     = detections[0]
-        val label   = top.label
-        val conf    = top.confidence
-        val confPct = (conf * 100).toInt()
-
-        tts.speak("$label ahead")
-
-        if (conf > 0.7f) {
-            FirebaseService.logDetection(label, conf)
-        }
-
-        activity?.runOnUiThread {
-            tvLabel.text = label
-            tvConf.text  = "$confPct%"
-            overlay.setYoloResults(detections, rotatedBitmap.width, rotatedBitmap.height)
+            val top     = detections[0]
+            tvLabel.text = top.label
+            tvConf.text  = "${(top.confidence * 100).toInt()}%"
 
             val obj1 = detections.getOrNull(0)
             if (obj1 != null) {
@@ -201,32 +199,6 @@ class CameraFragment : Fragment() {
                 tvObject2.visibility = View.GONE
             }
         }
-    }
-
-    /**
-     * Compresses [bitmap] to JPEG and overwrites stream/frame.jpg in Firebase Storage.
-     * Always overwrites the same file so the laptop viewer just refreshes one URL.
-     */
-    private fun uploadFrameToFirebase(bitmap: Bitmap) {
-        isUploading = true
-        val stream = ByteArrayOutputStream()
-        // Quality 60 → good balance of size vs clarity for a remote preview
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream)
-        val bytes = stream.toByteArray()
-
-        val ref = FirebaseStorage.getInstance()
-            .reference
-            .child("stream/frame.jpg")
-
-        ref.putBytes(bytes)
-            .addOnSuccessListener {
-                android.util.Log.d("CameraFragment", "Frame uploaded to Firebase Storage")
-                isUploading = false
-            }
-            .addOnFailureListener { e ->
-                android.util.Log.e("CameraFragment", "Upload failed: ${e.message}")
-                isUploading = false
-            }
     }
 
     private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {

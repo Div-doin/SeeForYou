@@ -21,6 +21,13 @@ class YoloDetector(context: Context) {
     private var interpreter: Interpreter
     private val inputSize = 640
 
+    // Motion detection state
+    private var previousBitmap: Bitmap? = null
+    private var forceFrameCount = 0
+    private val forceEveryNFrames = 5       // force inference every 5 skipped frames
+    private val motionThreshold = 15        // pixel difference threshold (0-255)
+    private val motionSampleStep = 16       // sample every 16th pixel for speed
+
     init {
         val options = Interpreter.Options().apply {
             numThreads = 4
@@ -39,13 +46,75 @@ class YoloDetector(context: Context) {
         )
     }
 
-    fun detect(bitmap: Bitmap, confThreshold: Float = 0.35f): List<Detection> {
+    /**
+     * Detects objects with adaptive motion-based frame skipping.
+     * Returns null if frame was skipped (use last result).
+     * Returns empty list if no objects found.
+     * Returns detections if objects found.
+     */
+    fun detectWithMotion(bitmap: Bitmap, confThreshold: Float = 0.25f): List<Detection>? {
+        forceFrameCount++
+
+        val shouldRunInference = when {
+            previousBitmap == null -> true                        // first frame — always run
+            forceFrameCount >= forceEveryNFrames -> true          // force every N skipped frames
+            hasMotion(bitmap, previousBitmap!!) -> true           // scene changed
+            else -> false                                          // skip this frame
+        }
+
+        if (!shouldRunInference) {
+            return null // signal to caller: reuse last result
+        }
+
+        forceFrameCount = 0
+        previousBitmap = bitmap.copy(bitmap.config ?: Bitmap.Config.ARGB_8888, false)
+
+        return detect(bitmap, confThreshold)
+    }
+
+    /**
+     * Checks if there is meaningful motion between two frames.
+     * Uses pixel sampling (not every pixel) for speed.
+     */
+    private fun hasMotion(current: Bitmap, previous: Bitmap): Boolean {
+        // Scale both to small size for fast comparison
+        val w = minOf(current.width, previous.width)
+        val h = minOf(current.height, previous.height)
+
+        var diffSum = 0
+        var sampleCount = 0
+
+        var y = 0
+        while (y < h) {
+            var x = 0
+            while (x < w) {
+                val cp = current.getPixel(x, y)
+                val pp = previous.getPixel(x, y)
+
+                val rDiff = Math.abs(((cp shr 16) and 0xFF) - ((pp shr 16) and 0xFF))
+                val gDiff = Math.abs(((cp shr 8) and 0xFF) - ((pp shr 8) and 0xFF))
+                val bDiff = Math.abs((cp and 0xFF) - (pp and 0xFF))
+
+                val pixelDiff = (rDiff + gDiff + bDiff) / 3
+                if (pixelDiff > motionThreshold) diffSum++
+                sampleCount++
+
+                x += motionSampleStep
+            }
+            y += motionSampleStep
+        }
+
+        if (sampleCount == 0) return true
+        val motionRatio = diffSum.toFloat() / sampleCount.toFloat()
+        return motionRatio > 0.05f // more than 5% of sampled pixels changed
+    }
+
+    fun detect(bitmap: Bitmap, confThreshold: Float = 0.25f): List<Detection> {
         val resized = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize, true)
         val inputBuffer = bitmapToByteBuffer(resized)
 
         // YOLOv8 output shape: [1, 84, 8400]
         val outputArray = Array(1) { Array(84) { FloatArray(8400) } }
-
         interpreter.run(inputBuffer, outputArray)
 
         return parseOutput(outputArray, bitmap.width, bitmap.height, confThreshold)
@@ -57,9 +126,9 @@ class YoloDetector(context: Context) {
         val pixels = IntArray(inputSize * inputSize)
         bitmap.getPixels(pixels, 0, inputSize, 0, 0, inputSize, inputSize)
         for (pixel in pixels) {
-            buffer.putFloat(((pixel shr 16) and 0xFF) / 255.0f) // R
-            buffer.putFloat(((pixel shr 8) and 0xFF) / 255.0f)  // G
-            buffer.putFloat((pixel and 0xFF) / 255.0f)           // B
+            buffer.putFloat(((pixel shr 16) and 0xFF) / 255.0f)
+            buffer.putFloat(((pixel shr 8) and 0xFF) / 255.0f)
+            buffer.putFloat((pixel and 0xFF) / 255.0f)
         }
         return buffer
     }
@@ -71,9 +140,8 @@ class YoloDetector(context: Context) {
         confThreshold: Float
     ): List<Detection> {
         val detections = mutableListOf<Detection>()
-        val numDetections = output[0][0].size // 8400
 
-        for (i in 0 until numDetections) {
+        for (i in 0 until 8400) {
             var maxConf = confThreshold
             var maxClassIdx = -1
 
@@ -110,7 +178,7 @@ class YoloDetector(context: Context) {
         return nms(detections)
     }
 
-    private fun nms(detections: List<Detection>, iouThreshold: Float = 0.5f): List<Detection> {
+    private fun nms(detections: List<Detection>, iouThreshold: Float = 0.45f): List<Detection> {
         val sorted = detections.sortedByDescending { it.confidence }.toMutableList()
         val result = mutableListOf<Detection>()
 
@@ -135,6 +203,7 @@ class YoloDetector(context: Context) {
 
     fun close() {
         interpreter.close()
+        previousBitmap = null
     }
 
     companion object {
