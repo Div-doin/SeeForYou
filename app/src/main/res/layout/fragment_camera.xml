@@ -5,17 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:implementationMode="compatible"/>
 
+    <!-- Detection Overlay -->
     <com.example.seeforyou.utils.DetectionOverlayView
         android:id="@+id/detection_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <!-- Top Status Bar — Detection Label -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,14 +47,45 @@
 
     </LinearLayout>
 
+    <!-- Bottom Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="80dp"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:layout_marginBottom="80dp">
 
+        <!-- Navigation Instruction Card — hidden until navigation starts -->
+        <LinearLayout
+            android:id="@+id/nav_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CC1565C0"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone">
+
+            <TextView
+                android:text="🧭"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/tv_nav_instruction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:text="Navigating..."/>
+
+        </LinearLayout>
+
+        <!-- Detected Objects Cards -->
         <TextView
             android:id="@+id/tv_object1"
             android:layout_width="match_parent"
@@ -72,6 +106,38 @@
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:visibility="gone"/>
+
+        <!-- Navigation Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btn_navigate"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:backgroundTint="#1565C0"
+                android:text="🎤 Navigate"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/btn_stop_nav"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:backgroundTint="#B71C1C"
+                android:text="⏹ Stop Nav"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

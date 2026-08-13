@@ -72,6 +72,9 @@ dependencies {
     // RecyclerView for log screen
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
+    // OkHttp for Navigation API
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
