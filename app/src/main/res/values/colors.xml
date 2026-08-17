@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Background -->
+    <color name="bg_primary">#0A0A0A</color>
+    <color name="bg_surface">#1A1A1A</color>
+    <color name="bg_surface_elevated">#242424</color>
+    <color name="bg_nav">#111111</color>
+
+    <!-- Brand / Primary -->
+    <color name="primary">#00E5FF</color>
+    <color name="primary_dark">#0097A7</color>
+    <color name="primary_dim">#1A2A2E</color>
+
+    <!-- Semantic Colors -->
+    <color name="success">#00E676</color>
+    <color name="warning">#FFD740</color>
+    <color name="danger">#FF1744</color>
+    <color name="danger_dark">#B71C1C</color>
+    <color name="danger_dim">#2A0A0A</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0BEC5</color>
+    <color name="text_hint">#546E7A</color>
+    <color name="text_cyan">#00E5FF</color>
+
+    <!-- Overlays -->
+    <color name="overlay_dark">#CC000000</color>
+    <color name="overlay_medium">#99000000</color>
+    <color name="divider">#1FFFFFFF</color>
+
+    <!-- Navigation Bar -->
+    <color name="nav_selected">#00E5FF</color>
+    <color name="nav_unselected">#546E7A</color>
+
+    <!-- Card borders -->
+    <color name="card_border">#2A00E5FF</color>
+    <color name="card_border_danger">#2AFF1744</color>
+    <color name="card_border_success">#2A00E676</color>
 </resources>

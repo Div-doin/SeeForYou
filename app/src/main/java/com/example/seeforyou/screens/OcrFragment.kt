@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -26,7 +26,9 @@ class OcrFragment : Fragment() {
 
     private lateinit var previewView: PreviewView
     private lateinit var tvResult: TextView
-    private lateinit var btnRead: Button
+    private lateinit var tvCharCount: TextView
+    private lateinit var tvCameraHint: TextView
+    private lateinit var btnRead: MaterialButton
     private lateinit var tts: TtsService
     private lateinit var cameraExecutor: ExecutorService
     private var imageCapture: ImageCapture? = null
@@ -44,6 +46,8 @@ class OcrFragment : Fragment() {
 
         previewView    = view.findViewById(R.id.ocr_preview)
         tvResult       = view.findViewById(R.id.tv_ocr_result)
+        tvCharCount    = view.findViewById(R.id.tv_char_count)
+        tvCameraHint   = view.findViewById(R.id.tv_camera_hint)
         btnRead        = view.findViewById(R.id.btn_read)
         tts            = TtsService(requireContext())
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -62,11 +66,7 @@ class OcrFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (hidden) {
-            releaseCamera()
-        } else {
-            startCamera()
-        }
+        if (hidden) releaseCamera() else startCamera()
     }
 
     private fun startCamera() {
@@ -106,7 +106,10 @@ class OcrFragment : Fragment() {
     @androidx.camera.core.ExperimentalGetImage
     private fun captureAndRead() {
         btnRead.isEnabled = false
-        tvResult.text     = "Reading..."
+        btnRead.text      = "Reading..."
+        tvCameraHint.text = "⏳  Processing image..."
+        tvResult.text     = ""
+        tvCharCount.text  = ""
 
         imageCapture?.takePicture(
             cameraExecutor,
@@ -125,20 +128,36 @@ class OcrFragment : Fragment() {
                             val text = result.text.trim()
                             activity?.runOnUiThread {
                                 if (text.isEmpty()) {
-                                    tvResult.text = "No text found. Try again."
-                                    tts.speak("No text found", force = true)
+                                    tvResult.textSize = 15f
+                                    tvResult.setTextColor(
+                                        requireContext().getColor(R.color.text_secondary)
+                                    )
+                                    tvResult.text    = "No text found.\n\nTips:\n• Get closer to the text\n• Make sure lighting is good\n• Hold phone steady"
+                                    tvCharCount.text = ""
+                                    tvCameraHint.text = "📷  Align text within frame"
+                                    tts.speak("No text found. Try again.", force = true)
                                 } else {
-                                    tvResult.text = text
+                                    tvResult.textSize = 16f
+                                    tvResult.setTextColor(
+                                        requireContext().getColor(R.color.text_primary)
+                                    )
+                                    tvResult.text    = text
+                                    tvCharCount.text = "${text.length} chars"
+                                    tvCameraHint.text = "✅  Text recognized"
                                     tts.speak(text, force = true)
                                     FirebaseService.logOcr(text)
                                 }
                                 btnRead.isEnabled = true
+                                btnRead.text      = "🔊  Read Text Aloud"
                             }
                         }
                         .addOnFailureListener {
                             activity?.runOnUiThread {
-                                tvResult.text     = "Failed to read. Try again."
+                                tvResult.text     = "Failed to read text.\nPlease try again."
+                                tvCharCount.text  = ""
+                                tvCameraHint.text = "📷  Align text within frame"
                                 btnRead.isEnabled = true
+                                btnRead.text      = "🔊  Read Text Aloud"
                             }
                         }
                         .addOnCompleteListener {
@@ -148,8 +167,10 @@ class OcrFragment : Fragment() {
 
                 override fun onError(exception: ImageCaptureException) {
                     activity?.runOnUiThread {
-                        tvResult.text     = "Camera error. Try again."
+                        tvResult.text     = "Camera error. Please try again."
+                        tvCameraHint.text = "📷  Align text within frame"
                         btnRead.isEnabled = true
+                        btnRead.text      = "🔊  Read Text Aloud"
                     }
                 }
             }
