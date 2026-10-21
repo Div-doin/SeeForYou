@@ -1,0 +1,20 @@
+<resources>
+    <string name="voice_no_transcript">फ़ोन कोई शब्द पहचान नहीं पाया। बीप के बाद ऐप की चुनी हुई भाषा में फिर बोलें।</string>
+    <string name="voice_heard">सुना: %1$s</string>
+    <string name="voice_command_unknown_heard">मैंने “%1$s” सुना, लेकिन आदेश समझ नहीं आया। “हिंदी में बात करो” या “पाठ पढ़ो” कहें।</string>
+    <string name="voice_language_retry">फ़ोन उस भाषा में आवाज़ पहचान नहीं कर पाया। सक्रिय करने वाला वाक्य फिर कहें और ऐप की चुनी हुई भाषा में बोलें। उस भाषा का वाक् पहचान मॉडल डाउनलोड करना पड़ सकता है।</string>
+    <string name="voice_enable">बिना छुए आवाज़ से चलाएँ</string>
+    <string name="voice_disable">बिना छुए आवाज़ से चलाना बंद करें</string>
+    <string name="voice_off">आवाज़ से चलाना बंद है। इसे चालू करके, ऐप खुला रहने पर “Hey SeeForYou” कहें। आदेशों के लिए फ़ोन की ऑनलाइन वाक् सेवा इस्तेमाल हो सकती है।</string>
+    <string name="voice_ready_wake">“Hey SeeForYou” कहें, बीप का इंतज़ार करें, फिर आदेश दें।</string>
+    <string name="voice_loading_model">ऑफ़लाइन आवाज़ पहचान तैयार हो रही है…</string>
+    <string name="voice_paused">ऐप के बोलने या आवाज़ लेने के दौरान सक्रिय करने वाला वाक्य सुनना रुका है।</string>
+    <string name="voice_wake_error">आवाज़ सुनना उपलब्ध नहीं है। इसे बंद करके फिर चालू करें।</string>
+    <string name="voice_command_starting">सक्रिय करने वाला वाक्य सुना। बीप का इंतज़ार करें।</string>
+    <string name="voice_command_listening">एक आदेश सुन रहा है…</string>
+    <string name="voice_command_retry">कोई आदेश नहीं मिला। सक्रिय करने वाला वाक्य कहकर फिर कोशिश करें।</string>
+    <string name="voice_command_unknown">आदेश समझ नहीं आया। “पाठ पढ़ो”, “सामने क्या है” या “हिंदी में बदलो” कहें।</string>
+    <string name="voice_language_changed">अब ऐप की भाषा हिंदी है।</string>
+    <string name="voice_mic_permission">आवाज़ से चलाने के लिए माइक्रोफ़ोन की अनुमति दें।</string>
+    <string name="voice_camera_permission">पाठ पढ़ने के लिए कैमरे की अनुमति दें।</string>
+</resources>

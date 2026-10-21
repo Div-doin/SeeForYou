@@ -1,0 +1,20 @@
+<resources>
+    <string name="voice_no_transcript">ಫೋನ್ ಯಾವುದೇ ಪದವನ್ನು ಗುರುತಿಸಲಿಲ್ಲ. ಬೀಪ್ ನಂತರ ಆ್ಯಪ್‌ನಲ್ಲಿ ಆಯ್ದ ಭಾಷೆಯಲ್ಲಿ ಮತ್ತೆ ಮಾತನಾಡಿ.</string>
+    <string name="voice_heard">ಕೇಳಿದ್ದು: %1$s</string>
+    <string name="voice_command_unknown_heard">“%1$s” ಎಂದು ಕೇಳಿಸಿತು, ಆದರೆ ಆದೇಶ ಅರ್ಥವಾಗಲಿಲ್ಲ. “ಕನ್ನಡದಲ್ಲಿ ಮಾತನಾಡಿ” ಅಥವಾ “ಪಠ್ಯ ಓದಿ” ಹೇಳಿ.</string>
+    <string name="voice_language_retry">ಫೋನಿಗೆ ಆ ಭಾಷೆಯ ಧ್ವನಿಯನ್ನು ಗುರುತಿಸಲು ಆಗಲಿಲ್ಲ. ಎಚ್ಚರಿಸುವ ಪದಗಳನ್ನು ಮತ್ತೆ ಹೇಳಿ, ಆ್ಯಪ್‌ನಲ್ಲಿ ಆಯ್ದ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡಿ. ಆ ಭಾಷೆಯ ಧ್ವನಿ ಗುರುತಿಸುವ ಮಾದರಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಬೇಕಾಗಬಹುದು.</string>
+    <string name="voice_enable">ಮುಟ್ಟದೆ ಧ್ವನಿಯಿಂದ ಬಳಸುವುದನ್ನು ಆರಂಭಿಸಿ</string>
+    <string name="voice_disable">ಮುಟ್ಟದೆ ಧ್ವನಿಯಿಂದ ಬಳಸುವುದನ್ನು ನಿಲ್ಲಿಸಿ</string>
+    <string name="voice_off">ಧ್ವನಿ ಆದೇಶಗಳು ನಿಂತಿವೆ. ಇದನ್ನು ಆರಂಭಿಸಿ, ಆ್ಯಪ್ ತೆರೆದಿರುವಾಗ “Hey SeeForYou” ಹೇಳಿ. ಆದೇಶಗಳಿಗೆ ಫೋನಿನ ಆನ್‌ಲೈನ್ ಧ್ವನಿ ಸೇವೆ ಬಳಕೆಯಾಗಬಹುದು.</string>
+    <string name="voice_ready_wake">“Hey SeeForYou” ಹೇಳಿ, ಬೀಪ್‌ಗಾಗಿ ಕಾಯಿರಿ, ನಂತರ ಆದೇಶ ನೀಡಿ.</string>
+    <string name="voice_loading_model">ಆಫ್‌ಲೈನ್ ಧ್ವನಿ ಗುರುತಿಸುವಿಕೆ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…</string>
+    <string name="voice_paused">ಆ್ಯಪ್ ಮಾತನಾಡುವಾಗ ಅಥವಾ ಧ್ವನಿ ಸ್ವೀಕರಿಸುವಾಗ ಎಚ್ಚರಿಸುವ ಪದಗಳನ್ನು ಕೇಳುವುದು ನಿಂತಿದೆ.</string>
+    <string name="voice_wake_error">ಧ್ವನಿ ಕೇಳುವುದು ಲಭ್ಯವಿಲ್ಲ. ನಿಲ್ಲಿಸಿ ಮತ್ತೆ ಆರಂಭಿಸಿ.</string>
+    <string name="voice_command_starting">ಎಚ್ಚರಿಸುವ ಪದಗಳು ಕೇಳಿಸಿವೆ. ಬೀಪ್‌ಗಾಗಿ ಕಾಯಿರಿ.</string>
+    <string name="voice_command_listening">ಒಂದು ಆದೇಶವನ್ನು ಕೇಳುತ್ತಿದೆ…</string>
+    <string name="voice_command_retry">ಆದೇಶ ಸಿಗಲಿಲ್ಲ. ಎಚ್ಚರಿಸುವ ಪದಗಳನ್ನು ಹೇಳಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="voice_command_unknown">ಆದೇಶ ಅರ್ಥವಾಗಲಿಲ್ಲ. “ಪಠ್ಯ ಓದಿ”, “ಮುಂದೆ ಏನಿದೆ” ಅಥವಾ “ಕನ್ನಡಕ್ಕೆ ಬದಲಿಸಿ” ಹೇಳಿ.</string>
+    <string name="voice_language_changed">ಈಗ ಆ್ಯಪ್ ಭಾಷೆ ಕನ್ನಡವಾಗಿದೆ.</string>
+    <string name="voice_mic_permission">ಧ್ವನಿ ಆದೇಶಗಳಿಗೆ ಮೈಕ್ರೋಫೋನ್ ಅನುಮತಿ ಬೇಕು.</string>
+    <string name="voice_camera_permission">ಪಠ್ಯ ಓದಲು ಕ್ಯಾಮೆರಾ ಅನುಮತಿ ಬೇಕು.</string>
+</resources>

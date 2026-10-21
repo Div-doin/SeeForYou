@@ -1,0 +1,20 @@
+<resources>
+    <string name="voice_no_transcript">The phone did not recognize any words. Try again after the beep in the app’s selected language.</string>
+    <string name="voice_heard">Heard: %1$s</string>
+    <string name="voice_command_unknown_heard">I heard “%1$s”, but could not match that command. Try “speak in Hindi” or “read the text”.</string>
+    <string name="voice_language_retry">The phone could not use that recognition language. Try the wake phrase again and speak in the app’s selected language. You may need to download its speech recognition model.</string>
+    <string name="voice_enable">Enable hands-free commands</string>
+    <string name="voice_disable">Turn off hands-free commands</string>
+    <string name="voice_off">Hands-free off. Enable once, then say “Hey SeeForYou” while the app is open. Commands may use your phone’s online speech service.</string>
+    <string name="voice_ready_wake">Say “Hey SeeForYou”, wait for the beep, then give a command.</string>
+    <string name="voice_loading_model">Preparing the offline wake listener…</string>
+    <string name="voice_paused">Wake listening paused while the app speaks or uses voice input.</string>
+    <string name="voice_wake_error">Wake listening unavailable. Turn hands-free off and on to retry.</string>
+    <string name="voice_command_starting">Wake phrase heard. Wait for the beep.</string>
+    <string name="voice_command_listening">Listening for one command…</string>
+    <string name="voice_command_retry">No command received. Try again after the wake phrase.</string>
+    <string name="voice_command_unknown">Command not understood. Try “read the text”, “describe surroundings”, or “change the language to Hindi”.</string>
+    <string name="voice_language_changed">The app language is now English.</string>
+    <string name="voice_mic_permission">Microphone permission is needed for hands-free commands.</string>
+    <string name="voice_camera_permission">Camera permission is needed to read text.</string>
+</resources>
