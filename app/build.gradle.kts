@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    implementation("com.alphacephei:vosk-android:0.3.75@aar")
+    implementation("net.java.dev.jna:jna:5.18.1@aar")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -60,6 +62,7 @@ dependencies {
 
     // ML Kit — keep ONLY text recognition for OCR tab
     implementation("com.google.mlkit:text-recognition:16.0.0")
+    implementation("com.google.mlkit:text-recognition-devanagari:16.0.0")
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
@@ -76,6 +79,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     testImplementation(libs.junit)
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 

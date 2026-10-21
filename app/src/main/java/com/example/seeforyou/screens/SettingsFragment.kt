@@ -1,124 +1,105 @@
 package com.example.seeforyou.screens
 
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.google.android.material.button.MaterialButton
 import com.example.seeforyou.R
+import com.example.seeforyou.localization.AppLanguage
+import com.example.seeforyou.localization.PhraseBook
 import com.example.seeforyou.services.TtsService
 import java.util.Locale
 
 class SettingsFragment : Fragment() {
-
-    private lateinit var sbVolume: SeekBar
-    private lateinit var sbSpeed: SeekBar
-    private lateinit var tvVolumeValue: TextView
-    private lateinit var tvSpeedValue: TextView
-    private lateinit var spinnerLang: Spinner
-    private lateinit var btnSave: MaterialButton
-    private lateinit var btnTest: MaterialButton
     private lateinit var tts: TtsService
-
-    private val languages = listOf(
-        Pair("English (India)", Locale("en", "IN")),
-        Pair("English (US)",    Locale.US),
-        Pair("Kannada",         Locale("kn", "IN")),
-        Pair("Hindi",           Locale("hi", "IN"))
-    )
-
-    private val speedLabels = listOf(
-        "Very Slow", "Slow", "Slow", "Moderate", "Moderate",
-        "Normal", "Normal", "Fast", "Fast", "Very Fast", "Very Fast"
-    )
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_settings, container, false)
+    private var checkGeneration = 0
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_settings, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        sbVolume      = view.findViewById(R.id.sb_volume)
-        sbSpeed       = view.findViewById(R.id.sb_speed)
-        tvVolumeValue = view.findViewById(R.id.tv_volume_value)
-        tvSpeedValue  = view.findViewById(R.id.tv_speed_value)
-        spinnerLang   = view.findViewById(R.id.spinner_language)
-        btnSave       = view.findViewById(R.id.btn_save_settings)
-        btnTest       = view.findViewById(R.id.btn_test_voice)
-        tts           = TtsService(requireContext())
-
-        // Language spinner
-        val langNames = languages.map { it.first }
-        spinnerLang.adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
-            langNames
-        )
-
-        // Load saved settings
-        val prefs = requireContext()
-            .getSharedPreferences("settings", Context.MODE_PRIVATE)
-        sbVolume.progress = prefs.getInt("volume", 80)
-        sbSpeed.progress  = prefs.getInt("speed", 5)
-        spinnerLang.setSelection(prefs.getInt("lang_index", 0))
-
-        // Set initial value labels
-        tvVolumeValue.text = "${sbVolume.progress}%"
-        tvSpeedValue.text  = speedLabels[sbSpeed.progress]
-
-        // Live update volume label
-        sbVolume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
-                tvVolumeValue.text = "$progress%"
-            }
-            override fun onStartTrackingTouch(sb: SeekBar?) {}
-            override fun onStopTrackingTouch(sb: SeekBar?) {}
-        })
-
-        // Live update speed label
-        sbSpeed.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
-                tvSpeedValue.text = speedLabels[progress]
-            }
-            override fun onStartTrackingTouch(sb: SeekBar?) {}
-            override fun onStopTrackingTouch(sb: SeekBar?) {}
-        })
-
-        // Save button
-        btnSave.setOnClickListener {
-            prefs.edit()
-                .putInt("volume",     sbVolume.progress)
-                .putInt("speed",      sbSpeed.progress)
-                .putInt("lang_index", spinnerLang.selectedItemPosition)
-                .apply()
-
-            tts.setSpeed(sbSpeed.progress / 10f + 0.1f)
-            tts.setLanguage(languages[spinnerLang.selectedItemPosition].second)
-            tts.speak("Settings saved", force = true)
-
-            btnSave.text = "✅  Saved!"
-            btnSave.postDelayed({ btnSave.text = "✅  Save Settings" }, 2000)
+        val volume = view.findViewById<SeekBar>(R.id.sb_volume)
+        val speed = view.findViewById<SeekBar>(R.id.sb_speed)
+        val volumeValue = view.findViewById<TextView>(R.id.tv_volume_value)
+        val speedValue = view.findViewById<TextView>(R.id.tv_speed_value)
+        val language = view.findViewById<Spinner>(R.id.spinner_language)
+        val status = view.findViewById<TextView>(R.id.tv_voice_status)
+        val prefs = AppLanguage.prefs(requireContext())
+        tts = TtsService(requireContext())
+        language.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, AppLanguage.names)
+        language.setSelection(AppLanguage.tags.indexOf(AppLanguage.tag(requireContext())))
+        volume.progress = prefs.getInt("volume", 80).coerceIn(0, 100)
+        speed.progress = prefs.getInt("speed", 5).coerceIn(0, 10)
+        fun labels() {
+            volumeValue.text = "${volume.progress}%"
+            speedValue.setText(when (speed.progress) {
+                0 -> R.string.speed_very_slow
+                1, 2 -> R.string.speed_slow
+                3, 4 -> R.string.speed_moderate
+                5, 6 -> R.string.speed_normal
+                7, 8 -> R.string.speed_fast
+                else -> R.string.speed_very_fast
+            })
         }
-
-        // Test button
-        btnTest.setOnClickListener {
-            tts.setSpeed(sbSpeed.progress / 10f + 0.1f)
-            tts.setLanguage(languages[spinnerLang.selectedItemPosition].second)
-            tts.speak(
-                "Hello. I can see a person ahead of you, one meter away.",
-                force = true
-            )
+        labels()
+        val listener = object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seek: SeekBar?, value: Int, user: Boolean) = labels()
+            override fun onStartTrackingTouch(seek: SeekBar?) {}
+            override fun onStopTrackingTouch(seek: SeekBar?) {}
+        }
+        volume.setOnSeekBarChangeListener(listener)
+        speed.setOnSeekBarChangeListener(listener)
+        fun savePreferences(tag: String) {
+            prefs.edit().putString("language_tag", tag)
+                .putInt("lang_index", AppLanguage.tags.indexOf(tag))
+                .putInt("speed", speed.progress).putInt("volume", volume.progress).apply()
+        }
+        fun check(preview: Boolean) {
+            val generation = ++checkGeneration
+            val tag = AppLanguage.tags[language.selectedItemPosition]
+            tts.setSpeed(speed.progress / 10f + 0.1f)
+            tts.setVolume(volume.progress / 100f)
+            status.setText(R.string.voice_loading)
+            tts.checkVoice(Locale.forLanguageTag(tag)) { result ->
+                if (generation == checkGeneration && this.view != null && !isHidden) {
+                    if (result < TextToSpeech.LANG_AVAILABLE) {
+                        status.setText(R.string.voice_missing)
+                        Toast.makeText(requireContext(), R.string.voice_missing, Toast.LENGTH_LONG).show()
+                    } else {
+                        status.setText(R.string.voice_ready)
+                        if (preview) tts.speak(PhraseBook(tag).text("voice_sample"), true)
+                    }
+                }
+            }
+        }
+        language.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, selected: View?, position: Int, id: Long) {
+                val tag = AppLanguage.tags[position]
+                if (tag != AppLanguage.tag(requireContext())) {
+                    // Apply the screen language even when voice data is missing or still loading.
+                    checkGeneration++
+                    tts.stop()
+                    savePreferences(tag)
+                    requireActivity().recreate()
+                } else check(false)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        view.findViewById<View>(R.id.btn_test_voice).setOnClickListener { check(true) }
+        view.findViewById<View>(R.id.btn_save_settings).setOnClickListener {
+            savePreferences(AppLanguage.tags[language.selectedItemPosition])
+            Toast.makeText(requireContext(), R.string.settings_saved, Toast.LENGTH_SHORT).show()
+            check(false)
+        }
+        view.findViewById<View>(R.id.btn_voice_settings).setOnClickListener {
+            try { startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
+            catch (_: android.content.ActivityNotFoundException) { startActivity(Intent(Settings.ACTION_SETTINGS)) }
         }
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        tts.shutdown()
-    }
+    override fun onHiddenChanged(hidden: Boolean) { super.onHiddenChanged(hidden); if (hidden) { checkGeneration++; tts.stop() } }
+    override fun onDestroyView() { checkGeneration++; tts.shutdown(); super.onDestroyView() }
 }

@@ -32,7 +32,7 @@ object FirebaseService {
         db.child("ocr_logs").child(key).setValue(data)
     }
 
-    fun sendSosAlert(lat: Double, lng: Double) {
+    fun sendSosAlert(lat: Double, lng: Double): com.google.android.gms.tasks.Task<Void> {
         val timestamp = formatter.format(Date())
         val data = mapOf(
             "lat" to lat.toString(),
@@ -40,7 +40,7 @@ object FirebaseService {
             "timestamp" to timestamp,
             "resolved" to false
         )
-        db.child("sos").push().setValue(data)
+        return db.child("sos").push().setValue(data)
     }
 
     fun getLogsReference(): DatabaseReference {

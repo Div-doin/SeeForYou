@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="48dp"
+        android:paddingTop="20dp"
         android:paddingBottom="32dp"
         android:paddingHorizontal="24dp"
         android:gravity="center_horizontal">
@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Emergency SOS"
+            android:text="@string/emergency_sos"
             android:textColor="@color/text_primary"
             android:textSize="28sp"
             android:textStyle="bold"
@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tap the button to send your location to emergency contacts"
+            android:text="@string/sos_intro"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:gravity="center"
@@ -81,15 +81,15 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SOS"
-                        android:textColor="@color/text_primary"
+                        android:text="@string/sos"
+                        android:textColor="@color/on_primary"
                         android:textSize="36sp"
                         android:textStyle="bold"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="HELP"
+                        android:text="@string/help"
                         android:textColor="#CCFFFFFF"
                         android:textSize="12sp"
                         android:textStyle="bold"
@@ -120,7 +120,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="STATUS"
+                    android:text="@string/status"
                     android:textColor="@color/text_hint"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -131,7 +131,7 @@
                     android:id="@+id/tv_sos_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ready to send SOS alert"
+                    android:text="@string/sos_ready"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:lineSpacingMultiplier="1.5"/>
@@ -161,7 +161,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📍  LOCATION SENT"
+                    android:text="@string/location_sent"
                     android:textColor="@color/success"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -199,7 +199,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⚠  HOW IT WORKS"
+                    android:text="@string/how_it_works"
                     android:textColor="@color/danger"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -209,7 +209,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="• Tap SOS to share your GPS location\n• Location is saved to emergency database\n• Voice confirmation will play automatically"
+                    android:text="@string/sos_steps"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:lineSpacingMultiplier="1.6"/>
@@ -221,3 +221,4 @@
     </LinearLayout>
 
 </ScrollView>
+

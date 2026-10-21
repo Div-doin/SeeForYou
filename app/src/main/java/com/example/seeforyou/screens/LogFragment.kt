@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.example.seeforyou.R
 import com.example.seeforyou.services.FirebaseService
+import com.example.seeforyou.localization.AppLanguage
 
 data class LogEntry(
     val label: String,
@@ -85,7 +86,7 @@ class LogAdapter(private val items: List<LogEntry>) :
         val confFloat = item.confidence.toFloatOrNull() ?: 0f
         val confPct   = (confFloat * 100).toInt()
 
-        holder.tvLabel.text = item.label.replaceFirstChar { it.uppercase() }
+        holder.tvLabel.text = AppLanguage.book(holder.itemView.context).objectName(item.label)
         holder.tvTime.text  = item.timestamp
         holder.tvConf.text  = "$confPct%"
         holder.tvConf.setTextColor(

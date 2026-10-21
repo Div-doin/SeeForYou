@@ -43,27 +43,27 @@ object DepthEstimator {
             boxHeightRatio > 0.60f -> DepthResult(
                 estimatedMeters = 0.5f,
                 zone = DistanceZone.IMMEDIATE,
-                description = "half a meter"
+                description = "may be very close"
             )
             boxHeightRatio > 0.40f -> DepthResult(
                 estimatedMeters = 0.8f,
                 zone = DistanceZone.IMMEDIATE,
-                description = "less than a meter"
+                description = "may be very close"
             )
             boxHeightRatio > 0.25f -> DepthResult(
                 estimatedMeters = 1.2f,
                 zone = DistanceZone.NEAR,
-                description = "about 1 meter"
+                description = "may be nearby"
             )
             boxHeightRatio > 0.15f -> DepthResult(
                 estimatedMeters = 2.0f,
                 zone = DistanceZone.MEDIUM,
-                description = "2 meters"
+                description = "distance unknown"
             )
             boxHeightRatio > 0.08f -> DepthResult(
                 estimatedMeters = 3.0f,
                 zone = DistanceZone.MEDIUM,
-                description = "3 meters"
+                description = "distance unknown"
             )
             else -> DepthResult(
                 estimatedMeters = 5.0f,

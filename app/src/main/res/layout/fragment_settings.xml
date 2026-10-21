@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bg_nav"
-        android:paddingTop="48dp"
+        android:paddingTop="20dp"
         android:paddingBottom="16dp"
         android:paddingHorizontal="20dp"
         android:orientation="vertical">
@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Settings"
+            android:text="@string/settings"
             android:textColor="@color/text_primary"
             android:textSize="22sp"
             android:textStyle="bold"/>
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Customize voice and language"
+            android:text="@string/customize_voice"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:layout_marginTop="2dp"/>
@@ -49,7 +49,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AUDIO"
+                android:text="@string/audio"
                 android:textColor="@color/primary"
                 android:textSize="11sp"
                 android:textStyle="bold"
@@ -82,7 +82,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="🔊  Volume"
+                            android:text="@string/volume"
                             android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold"/>
@@ -136,7 +136,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="⚡  Speech Speed"
+                            android:text="@string/speech_speed"
                             android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold"/>
@@ -145,7 +145,7 @@
                             android:id="@+id/tv_speed_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Normal"
+                            android:text="@string/speed_normal"
                             android:textColor="@color/primary"
                             android:textSize="15sp"
                             android:textStyle="bold"/>
@@ -172,14 +172,14 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Slow"
+                            android:text="@string/speed_slow"
                             android:textColor="@color/text_hint"
                             android:textSize="11sp"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Fast"
+                            android:text="@string/speed_fast"
                             android:textColor="@color/text_hint"
                             android:textSize="11sp"/>
 
@@ -193,7 +193,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LANGUAGE"
+                android:text="@string/language"
                 android:textColor="@color/primary"
                 android:textSize="11sp"
                 android:textStyle="bold"
@@ -218,7 +218,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🌐  Voice Language"
+                        android:text="@string/voice_language"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold"
@@ -239,7 +239,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ACTIONS"
+                android:text="@string/actions"
                 android:textColor="@color/primary"
                 android:textSize="11sp"
                 android:textStyle="bold"
@@ -247,19 +247,35 @@
                 android:layout_marginBottom="8dp"/>
 
             <!-- Test Voice Button -->
+            <TextView
+                android:id="@+id/tv_voice_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="@string/voice_loading"
+                android:textColor="@color/text_primary"
+                android:accessibilityLiveRegion="polite" />
+            <Button
+                android:id="@+id/btn_voice_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/voice_settings" />
+
+            <!-- Test Voice Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_test_voice"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginBottom="12dp"
-                android:text="🎤  Test Voice"
+                android:text="@string/test_voice"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
                 app:backgroundTint="@color/bg_surface"
                 app:strokeColor="@color/primary"
                 app:strokeWidth="1dp"
-                app:cornerRadius="8dp"/>
+                app:cornerRadius="16dp"/>
 
             <!-- Save Button -->
             <com.google.android.material.button.MaterialButton
@@ -267,15 +283,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginBottom="32dp"
-                android:text="✅  Save Settings"
+                android:text="@string/save_settings"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/bg_primary"
+                android:textColor="@color/on_primary"
                 app:backgroundTint="@color/primary"
-                app:cornerRadius="8dp"/>
+                app:cornerRadius="16dp"/>
 
         </LinearLayout>
 
     </ScrollView>
 
 </LinearLayout>
+

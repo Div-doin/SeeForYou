@@ -114,10 +114,10 @@ class SosFragment : Fragment() {
 
     private fun sendSos() {
         isSending = true
-        tvStatus.text = "Getting your location..."
+        tvStatus.text = getString(R.string.getting_location)
         cardLocation.visibility = View.GONE
         startSendingPulse()
-        tts.speak("Sending SOS alert now", force = true)
+        tts.speak(getString(R.string.sending_sos), force = true)
 
         val hasLocation = ContextCompat.checkSelfPermission(
             requireContext(),
@@ -126,7 +126,7 @@ class SosFragment : Fragment() {
 
         if (!hasLocation) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 102)
-            tvStatus.text = "Location permission needed.\nPlease allow location and try again."
+            tvStatus.text = getString(R.string.sos_permission)
             isSending = false
             startIdlePulse()
             return
@@ -136,36 +136,49 @@ class SosFragment : Fragment() {
 
         fusedClient.lastLocation
             .addOnSuccessListener { location ->
+                if (view == null) return@addOnSuccessListener
                 if (location != null) {
+                    tvStatus.text = getString(R.string.sending_sos)
                     FirebaseService.sendSosAlert(location.latitude, location.longitude)
-
-                    tvStatus.text = "✅  SOS Alert Sent Successfully"
+                        .addOnSuccessListener saved@{
+                    if (view == null) return@saved
+                    tvStatus.text = getString(R.string.sos_sent)
 
                     // Show location card
-                    tvLocation.text =
-                        "Latitude:   ${String.format("%.6f", location.latitude)}\n" +
-                                "Longitude: ${String.format("%.6f", location.longitude)}"
+                    tvLocation.text = getString(R.string.coordinates,
+                        String.format("%.6f", location.latitude),
+                        String.format("%.6f", location.longitude))
                     cardLocation.visibility = View.VISIBLE
 
-                    tts.speak("SOS alert sent. Help is on the way.", force = true)
+                    tts.speak(getString(R.string.sos_sent), force = true)
                     stopPulse()
                     isSending = false
 
                     // Re-enable after 10 seconds
                     btnSos.postDelayed({
-                        tvStatus.text = "Ready to send SOS alert"
+                        if (view == null) return@postDelayed
+                        tvStatus.text = getString(R.string.sos_ready)
                         cardLocation.visibility = View.GONE
                         startIdlePulse()
                     }, 10000)
+                        }.addOnFailureListener {
+                            if (view != null) {
+                                tvStatus.text = getString(R.string.sos_failed)
+                                tts.speak(getString(R.string.sos_failed), force = true)
+                                isSending = false
+                                startIdlePulse()
+                            }
+                        }
 
                 } else {
-                    tvStatus.text = "Could not get location.\nPlease try again."
+                    tvStatus.text = getString(R.string.sos_location_failed)
                     isSending = false
                     startIdlePulse()
                 }
             }
             .addOnFailureListener {
-                tvStatus.text = "Failed to send SOS.\nCheck location settings."
+                if (view == null) return@addOnFailureListener
+                tvStatus.text = getString(R.string.sos_failed)
                 isSending = false
                 startIdlePulse()
             }

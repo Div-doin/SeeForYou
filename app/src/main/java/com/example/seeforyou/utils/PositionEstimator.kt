@@ -86,7 +86,7 @@ object PositionEstimator {
     ): String {
         return when (depth.zone) {
             DepthEstimator.DistanceZone.IMMEDIATE ->
-                "Stop. $label ${position.description}, ${depth.description}."
+                "Caution. $label ${position.description}, ${depth.description}."
             DepthEstimator.DistanceZone.NEAR ->
                 "$label ${position.description}, ${depth.description}."
             DepthEstimator.DistanceZone.MEDIUM ->

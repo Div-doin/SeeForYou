@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" android:orientation="vertical" android:background="@color/bg_primary">
+<FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="100dp">
 
     <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
@@ -15,6 +16,7 @@
     <!-- Detection Overlay -->
     <com.example.seeforyou.utils.DetectionOverlayView
         android:id="@+id/detection_overlay"
+        android:importantForAccessibility="no"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
@@ -22,46 +24,54 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#99000000"
+        android:background="@color/bg_surface"
         android:orientation="horizontal"
         android:padding="12dp"
-        android:paddingTop="48dp">
+        android:paddingTop="20dp">
 
         <TextView
             android:id="@+id/tv_detection_label"
+            android:importantForAccessibility="no"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Scanning..."
-            android:textColor="#FFFFFF"
+            android:text="@string/scanning"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tv_confidence"
+            android:importantForAccessibility="no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#AAFFAA"
+            android:textColor="@color/success"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
     </LinearLayout>
 
-    <!-- Bottom Section -->
+    </FrameLayout>
+    <!-- Scrollable controls remain reachable with enlarged text. -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="1.7"
+        android:layout_marginBottom="0dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+
         android:orientation="vertical"
-        android:padding="12dp"
-        android:layout_marginBottom="80dp">
+        android:padding="16dp" android:background="@color/bg_primary">
 
         <!-- Navigation Instruction Card — hidden until navigation starts -->
         <LinearLayout
             android:id="@+id/nav_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#CC1565C0"
+            android:background="@color/primary_dim"
             android:orientation="horizontal"
             android:padding="12dp"
             android:layout_marginBottom="8dp"
@@ -79,35 +89,71 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp"
-                android:text="Navigating..."/>
+                android:text="@string/navigating"/>
 
         </LinearLayout>
 
         <!-- Detected Objects Cards -->
-        <TextView
-            android:id="@+id/tv_object1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#CC000000"
-            android:padding="12dp"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:visibility="gone"/>
+        
 
-        <TextView
-            android:id="@+id/tv_object2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#CC000000"
-            android:layout_marginTop="6dp"
-            android:padding="12dp"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:visibility="gone"/>
+        
 
         <!-- Navigation Buttons -->
+        <TextView
+            android:id="@+id/tv_speech_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/panel_surface"
+            android:padding="10dp"
+            android:text="@string/quiet_ready"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_describe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:text="@string/describe_surroundings"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textColor="@color/on_primary"
+            android:backgroundTint="@color/primary" />
+
+        <Button
+            android:id="@+id/btn_read_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/read_text_action"
+            android:textAllCaps="false"
+            android:textColor="@color/on_primary"
+            android:backgroundTint="@color/primary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_repeat" style="@style/OutlineButton" android:backgroundTint="@color/primary_dim" android:textColor="@color/primary" android:layout_marginEnd="4dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/repeat_speech"
+                android:textAllCaps="false" />
+            <Button
+                android:id="@+id/btn_silence" style="@style/OutlineButton" android:backgroundTint="@color/primary_dim" android:textColor="@color/primary" android:layout_marginStart="4dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/stop_speaking"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -120,9 +166,9 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="4dp"
-                android:backgroundTint="#1565C0"
-                android:text="🎤 Navigate"
-                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/primary"
+                android:text="@string/navigate"
+                android:textColor="@color/on_primary"
                 android:textSize="14sp"/>
 
             <Button
@@ -132,13 +178,37 @@
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:backgroundTint="#B71C1C"
-                android:text="⏹ Stop Nav"
-                android:textColor="#FFFFFF"
+                android:text="@string/stop_nav"
+                android:textColor="@color/on_primary"
                 android:textSize="14sp"
                 android:visibility="gone"/>
 
         </LinearLayout>
 
+<TextView
+            android:id="@+id/tv_object1"
+            android:importantForAccessibility="no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/panel_surface"
+            android:padding="12dp"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:visibility="gone"/>
+<TextView
+            android:id="@+id/tv_object2"
+            android:importantForAccessibility="no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/panel_surface"
+            android:layout_marginTop="6dp"
+            android:padding="12dp"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:visibility="gone"/>
     </LinearLayout>
+    </ScrollView>
+</LinearLayout>
 
-</FrameLayout>
+
+

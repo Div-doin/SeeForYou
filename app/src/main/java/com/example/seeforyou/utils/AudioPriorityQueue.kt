@@ -1,137 +1,128 @@
 package com.example.seeforyou.utils
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import java.util.PriorityQueue
 import java.util.Locale
-import java.util.concurrent.atomic.AtomicBoolean
+import android.widget.Toast
+import com.example.seeforyou.R
+import com.example.seeforyou.localization.AppLanguage
+import com.example.seeforyou.voice.SpeechGate
 
-/**
- * Smart audio queue that handles both navigation and object detection speech.
- * Ensures danger alerts always interrupt lower-priority speech.
- * Prevents overlapping speech.
- */
-class AudioPriorityQueue(context: Context) {
-
+/** Serialize speech on the main thread; urgent alerts interrupt directions. */
+class AudioPriorityQueue(private val context: Context) {
     enum class Priority(val level: Int) {
-        DANGER(0),      // immediate obstacle — interrupts everything
-        WARNING(1),     // close obstacle — speaks after current word
-        NAVIGATION(2),  // turn instructions
-        CAUTION(3),     // medium distance obstacle
-        INFO(4)         // general route info
+        DANGER(0), WARNING(1), NAVIGATION(2), CAUTION(3), INFO(4)
     }
-
-    data class AudioMessage(
-        val text: String,
-        val priority: Priority,
-        val id: String = System.currentTimeMillis().toString()
-    ) : Comparable<AudioMessage> {
-        override fun compareTo(other: AudioMessage): Int =
-            this.priority.level.compareTo(other.priority.level)
-    }
-
+    private data class Message(val text: String, val priority: Priority, val id: String,
+        val created: Long = SystemClock.elapsedRealtime())
+    private val main = Handler(Looper.getMainLooper())
+    private val queue = mutableListOf<Message>()
+    private var current: Message? = null
+    private var sequence = 0L
+    private var ready = false
+    private var closed = false
+    private var engineFailed = false
+    @Volatile var paused = false
+        private set
+    private var lastText = ""
+    private var lastTime = 0L
     private var tts: TextToSpeech? = null
-    private val isSpeaking = AtomicBoolean(false)
-    private val queue = PriorityQueue<AudioMessage>()
-    private var isInitialized = false
-
-    // Track last spoken text per priority to avoid repetition
-    private val lastSpoken = mutableMapOf<Priority, String>()
-    private val lastSpokenTime = mutableMapOf<Priority, Long>()
-
-    // Cooldown per priority in milliseconds
-    private val cooldowns = mapOf(
-        Priority.DANGER     to 2000L,
-        Priority.WARNING    to 3000L,
-        Priority.NAVIGATION to 5000L,
-        Priority.CAUTION    to 4000L,
-        Priority.INFO       to 8000L
-    )
 
     init {
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.US
-                tts?.setSpeechRate(0.95f)
-                isInitialized = true
-
+        tts = TextToSpeech(context.applicationContext) { status -> main.post {
+            if (!closed && status == TextToSpeech.SUCCESS) {
+                ready = true
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {}
-                    override fun onDone(utteranceId: String?) {
-                        isSpeaking.set(false)
-                        processNext()
-                    }
-                    override fun onError(utteranceId: String?) {
-                        isSpeaking.set(false)
-                        processNext()
-                    }
+                    override fun onDone(utteranceId: String?) = finished(utteranceId)
+                    override fun onStop(utteranceId: String?, interrupted: Boolean) = finished(utteranceId)
+                    override fun onError(utteranceId: String?, errorCode: Int) = finished(utteranceId)
+                    @Deprecated("Android legacy callback")
+                    override fun onError(utteranceId: String?) = finished(utteranceId)
                 })
+                next()
+            } else if (!closed) {
+                engineFailed = true
+                if (queue.isNotEmpty()) Toast.makeText(context, R.string.voice_failed, Toast.LENGTH_LONG).show()
+                queue.clear()
             }
-        }
+        } }
     }
 
-    /**
-     * Add message to queue with priority.
-     * DANGER messages flush queue and speak immediately.
-     */
-    fun speak(text: String, priority: Priority) {
-        if (!isInitialized) return
+    private fun finished(id: String?) { main.post {
+        if (current?.id == id) { current = null; SpeechGate.set(this, false); next() }
+    } }
 
-        // Check cooldown — don't repeat same message too fast
-        val now = System.currentTimeMillis()
-        val lastText = lastSpoken[priority]
-        val lastTime = lastSpokenTime[priority] ?: 0L
-        val cooldown = cooldowns[priority] ?: 3000L
-
-        if (lastText == text && (now - lastTime) < cooldown) return
-
-        val message = AudioMessage(text, priority)
-
-        if (priority == Priority.DANGER) {
-            // Danger: clear queue, interrupt current speech, speak now
-            synchronized(queue) { queue.clear() }
+    fun speak(text: String, priority: Priority) { main.post {
+        if (closed || paused) return@post
+        if (engineFailed) {
+            Toast.makeText(context, R.string.voice_failed, Toast.LENGTH_LONG).show()
+            return@post
+        }
+        val now = SystemClock.elapsedRealtime()
+        if (lastText == text && now - lastTime < 3000) return@post
+        if (current?.text == text || queue.any { it.text == text }) return@post
+        val message = Message(text, priority, (++sequence).toString())
+        // Retain only the latest pending message in each category.
+        queue.removeAll { it.priority == priority }
+        val speaking = current
+        val replacesDirection = priority == Priority.NAVIGATION && speaking?.priority == Priority.NAVIGATION
+        if (speaking != null && ((priority.level < speaking.priority.level && priority.level <= 2) || replacesDirection)) {
+            if (speaking.priority == Priority.NAVIGATION && queue.none { it.priority == Priority.NAVIGATION }) {
+                queue.add(speaking.copy(id = (++sequence).toString()))
+            }
+            current = null
             tts?.stop()
-            isSpeaking.set(false)
-            speakNow(message)
-        } else {
-            synchronized(queue) { queue.offer(message) }
-            if (!isSpeaking.get()) {
-                processNext()
-            }
+        }
+        queue.add(message)
+        next()
+    } }
+
+    private fun next() {
+        if (!ready || closed || paused || current != null) return
+        queue.removeAll { SystemClock.elapsedRealtime() - it.created > 15000 }
+        val message = queue.minByOrNull { it.priority.level } ?: return
+        queue.remove(message)
+        if ((tts?.setLanguage(AppLanguage.locale(context)) ?: TextToSpeech.ERROR) < TextToSpeech.LANG_AVAILABLE) {
+            queue.clear()
+            Toast.makeText(context, R.string.voice_missing, Toast.LENGTH_LONG).show()
+            return
+        }
+        tts?.setSpeechRate(AppLanguage.speed(context))
+        current = message
+        SpeechGate.set(this, true)
+        lastText = message.text
+        lastTime = SystemClock.elapsedRealtime()
+        if (tts?.speak(message.text, TextToSpeech.QUEUE_FLUSH,
+                AppLanguage.speechParams(AppLanguage.volume(context)), message.id) == TextToSpeech.ERROR) {
+            current = null
+            SpeechGate.set(this, false)
+            next()
         }
     }
 
-    private fun processNext() {
-        val next = synchronized(queue) { queue.poll() } ?: return
-        speakNow(next)
-    }
-
-    private fun speakNow(message: AudioMessage) {
-        if (!isInitialized) return
-        isSpeaking.set(true)
-        lastSpoken[message.priority] = message.text
-        lastSpokenTime[message.priority] = System.currentTimeMillis()
-        tts?.speak(message.text, TextToSpeech.QUEUE_FLUSH, null, message.id)
-    }
-
-    fun setSpeed(speed: Float) {
-        tts?.setSpeechRate(speed)
-    }
-
-    fun setLanguage(locale: Locale) {
-        tts?.language = locale
-    }
-
-    fun stop() {
-        tts?.stop()
-        synchronized(queue) { queue.clear() }
-        isSpeaking.set(false)
-    }
-
-    fun shutdown() {
+    fun setSpeed(speed: Float) { main.post { tts?.setSpeechRate(speed) } }
+    fun setLanguage(locale: Locale) { main.post { tts?.language = locale } }
+    fun stop() { main.post { queue.clear(); current = null; tts?.stop(); SpeechGate.set(this, false) } }
+    fun pause() {
+        paused = true
         stop()
+    }
+    fun resume() {
+        paused = false
+        main.post { lastText = ""; lastTime = 0L }
+    }
+    fun shutdown() { main.post {
+        closed = true
+        SpeechGate.set(this, false)
+        queue.clear()
+        current = null
+        tts?.stop()
         tts?.shutdown()
         tts = null
-    }
+    } }
 }

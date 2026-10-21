@@ -19,6 +19,7 @@ data class Detection(
 class YoloDetector(context: Context) {
 
     private var interpreter: Interpreter
+    private var closed = false
     private val inputSize = 640
 
     // Motion detection state
@@ -52,7 +53,9 @@ class YoloDetector(context: Context) {
      * Returns empty list if no objects found.
      * Returns detections if objects found.
      */
+    @Synchronized
     fun detectWithMotion(bitmap: Bitmap, confThreshold: Float = 0.25f): List<Detection>? {
+        if (closed) return null
         forceFrameCount++
 
         val shouldRunInference = when {
@@ -109,7 +112,9 @@ class YoloDetector(context: Context) {
         return motionRatio > 0.05f // more than 5% of sampled pixels changed
     }
 
+    @Synchronized
     fun detect(bitmap: Bitmap, confThreshold: Float = 0.25f): List<Detection> {
+        if (closed) return emptyList()
         val resized = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize, true)
         val inputBuffer = bitmapToByteBuffer(resized)
 
@@ -201,7 +206,11 @@ class YoloDetector(context: Context) {
         return if (unionArea <= 0f) 0f else interArea / unionArea
     }
 
+    // Inference and native teardown must never overlap, including queued frames.
+    @Synchronized
     fun close() {
+        if (closed) return
+        closed = true
         interpreter.close()
         previousBitmap = null
     }

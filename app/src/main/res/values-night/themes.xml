@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.SeeForYou" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.SeeForYou" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Background -->
         <item name="android:windowBackground">@color/bg_primary</item>
         <item name="android:colorBackground">@color/bg_primary</item>
@@ -8,7 +8,7 @@
         <!-- Primary brand color -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item><item name="colorSurface">@color/bg_surface</item><item name="colorOnSurface">@color/text_primary</item><item name="android:windowLightNavigationBar">true</item><item name="materialButtonStyle">@style/PrimaryButton</item><item name="colorAccent">@color/primary</item>
 
         <!-- Text -->
         <item name="android:textColorPrimary">@color/text_primary</item>
@@ -17,7 +17,7 @@
 
         <!-- Status bar -->
         <item name="android:statusBarColor">@color/bg_nav</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
 
         <!-- Navigation bar -->
         <item name="android:navigationBarColor">@color/bg_nav</item>
@@ -35,24 +35,24 @@
     <!-- Button Styles -->
     <style name="PrimaryButton" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">@color/primary</item>
-        <item name="android:textColor">@color/bg_primary</item>
+        <item name="android:textColor">@color/on_primary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="cornerRadius">16dp</item><item name="android:textAllCaps">false</item><item name="android:minHeight">52dp</item>
     </style>
 
     <style name="DangerButton" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">@color/danger</item>
-        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColor">@color/on_primary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="cornerRadius">16dp</item><item name="android:textAllCaps">false</item><item name="android:minHeight">52dp</item>
     </style>
 
     <style name="OutlineButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textColor">@color/primary</item>
         <item name="strokeColor">@color/primary</item>
         <item name="android:textStyle">bold</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="cornerRadius">16dp</item><item name="android:textAllCaps">false</item><item name="android:minHeight">52dp</item>
     </style>
 </resources>
